@@ -1,17 +1,18 @@
 //https://www.youtube.com/watch?v=EkTOTw_lpVg - zródło inspiracji
-
+import processing.serial.*;
+Serial myPort;
+String val;
 
 int liczbaKart = 6;
 Cards[] myCard = new Cards[liczbaKart+1];
 int[] x = new int[liczbaKart+1];
 int[] y = new int[liczbaKart+1];
-int[] fv = new int[liczbaKart+1]; // określa jaki obrazek się pokaże (z listy 1,2,3,1,2,3); 0 to obraz przykrytej karty
-
+int[] fv = new int[liczbaKart+1]; // lista jaki obrazek [1,2,3] jest w każdym miescu listy 
 int[] cardUp = new int[2]; //karty, które sa obrócone - odniesione do lokalizacji na planszy
-boolean[] clicked = new boolean[liczbaKart];
+boolean[] clicked = new boolean[liczbaKart]; //zmienna, która określa, które karty są obrócone, by nie można było drugi raz ich kliknąć (zapobiega parze w parze
 
 PFont myFont;
-int flipped = 0; // określa, czy karta jest obrócona, czy nie
+int flipped = 0; // określa, ile kart jest już obróconych 
 int win = 0; //określa ile par już zebrano
 int count = 1; // potrzebne do liczenia fv
 
@@ -20,7 +21,9 @@ int cardWidth = 300;
 int cardHeight = 300;
   
 void setup() {
-  frameRate(10);
+  myPort = new Serial(this, "COM5",9600);
+  
+  frameRate(30);
   size(1500,900);
 
   RysowanieKart();
@@ -29,10 +32,22 @@ void setup() {
 }
 
 void draw() {
+
+  //łaczenie z Arduino 
+  if ( myPort.available() > 0) {  // If data is available,
+  val = myPort.readStringUntil('\n');  // read it and store it in val 
+  //print(val);
+  }
+  if(val == "1"){}
+  
+  
+  //ładowanie kart
   for (int i =0; i < liczbaKart; i ++) {
     myCard[i].display();
   }
     obrocKarte(); //funkcja, która obraca karty i patrzy czy są falami
+
+
 
 }
 
@@ -72,48 +87,52 @@ void RysowanieKart(){
      println(fv[i]);
   }
 }
-
+int display_until_time = -1;
 // sprawdza położenie myszki i gdy ta została kliknięta w obszarze karty to rysuje jej środek
 void obrocKarte() {
-  if (mousePressed){
-    for (int i = 0; i < liczbaKart+1; i ++){
-      if(mouseX > x[i] && mouseX<(x[i] + myCard[0].cardWidth) &&
-      mouseY > y[i] && mouseY < (y[i] + myCard[0].cardHeight) && 
-      (clicked[i] == false)){
-        myCard[i].displayFront();
-        clicked[i] = true;
-        cardUp[flipped] =  i;
-        
-        flipped ++;
 
-     if (flipped == 2) {
+    for (int i = 0; i < liczbaKart+1; i ++){
+      if((val == "1") || mousePressed && mouseX > x[i] && mouseX<(x[i] + myCard[0].cardWidth) &&
+      mouseY > y[i] && mouseY < (y[i] + myCard[0].cardHeight) && (clicked[i] == false) ){
+        //if (val == "Button 1") {i = 1;}
+
+        myCard[i].displayFront();
+
+        clicked[i] = true;
+        
+        cardUp[flipped] =  i; //cardUp[0] i cardUp[1]
+
+        flipped ++;
+      }
+    }
+    
+//sprawdzanie par
+     if (flipped == 2) {       
         println("0: ", fv[cardUp[0]]);
         println("1: ", fv[cardUp[1]]);
         
       //sprawdzanie, czy to te same karty
-      if (fv[cardUp[0]] == fv[cardUp[1]]){
-        myCard[cardUp[0]].matched();
-        myCard[cardUp[1]].matched();
-        win +=1;
-      } 
-      
-      //UWAGA! tu jest problem, bo nie pokazują się dobrze karty, jak nie ma pary ;//
-      else if(fv[cardUp[0]] != fv[cardUp[1]]){
-        print("nie ma pary");
-        resetPlanszy(cardUp[0]);
-        //myCard[cardUp[1]].displayFront();
+        if (fv[cardUp[0]] == fv[cardUp[1]]){ 
+          myCard[cardUp[0]].matched();
+          myCard[cardUp[1]].matched();
+          win +=1;
+        }
+     
+      ////UWAGA! tu jest problem, bo nie pokazują się dobrze karty, jak nie ma pary ;//
+        else if(fv[cardUp[0]] != fv[cardUp[1]]){
+             print("nie ma pary");
 
-        resetPlanszy(cardUp[1]);
+            resetPlanszy(cardUp[0]);
+            resetPlanszy(cardUp[1]);
+        }
+                flipped = 0;
       }
-        flipped = 0;
-          
-       if (win == 3){
-         tekstWygranej();
-       }
-       }
+     
+     //jak 3 pary to wyświetl wygraną i wyświetl zwycieskie światełka
+     if (win == 3){
+       myPort.write('1');
+       tekstWygranej();
       }
-    }
-  }
 }
 
 //zmienianie indeksów kart
@@ -129,9 +148,8 @@ void tasowanie() {
   }
   //tasowanie listy
   numberList.shuffle();
-  println(numberList);
   
-  //przypisywanie nowej kolejności indeksów 
+  //przypisywanie nowej kolejności indeksów w fv, które odnoszą się do ułozenia par na planszy
   int temp = 0;
   int rand = 0;
   for (int w = 0; w <liczbaKart; w ++){
@@ -139,6 +157,7 @@ void tasowanie() {
     temp = fv[w];
     fv[w] = fv[rand];
     fv[rand] = temp;
+
   }
 }
 
