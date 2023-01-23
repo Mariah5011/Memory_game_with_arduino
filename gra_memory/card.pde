@@ -6,8 +6,10 @@ class Cards {
   int cardX = 0; // współrzędna x karty
   int cardY = 0;  // współrzędna y karty
   int faceValue = 0; //numer który, będzie potrzebny do rozmoznawania pary
-  String[] cardName = {"img1_1.jpg", "img2.PNG", "img3.PNG", "img4.PNG"};
-                        //"img2.jpg", "img3.jpg", "img6.png"};
+  String[] cardName = {"img1_1.jpg", "img2.PNG", "img3.PNG", "img4.PNG",
+                          "img2.jpg", "img3.PNG", "img4.PNG"};
+//};
+
   
 Cards(int x, int y, int fv) {
     cardX = x;
@@ -17,12 +19,15 @@ Cards(int x, int y, int fv) {
   
   void display() {
     cardImage = loadImage(cardName[show]);
+
     cardImage.resize(cardWidth,cardHeight);
     image(cardImage, cardX, cardY);
+
   }
   
   void displayFront(){
     show = faceValue;
+    display();
   }
   
   void faceDown(){
