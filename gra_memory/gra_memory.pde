@@ -21,7 +21,7 @@ int cardWidth = 300;
 int cardHeight = 300;
   
 void setup() {
-  myPort = new Serial(this, "COM5",9600);
+  //myPort = new Serial(this, "COM5",9600);
   
   frameRate(30);
   size(1500,900);
@@ -34,11 +34,11 @@ void setup() {
 void draw() {
 
   //łaczenie z Arduino 
-  if ( myPort.available() > 0) {  // If data is available,
-  val = myPort.readStringUntil('\n');  // read it and store it in val 
+  //if ( myPort.available() > 0) {  // If data is available,
+  //val = myPort.readStringUntil('\n');  // read it and store it in val 
   //print(val);
-  }
-  if(val == "1"){}
+  //}
+  //if(val == "1"){}
   
   
   //ładowanie kart
@@ -47,7 +47,7 @@ void draw() {
   }
     obrocKarte(); //funkcja, która obraca karty i patrzy czy są falami
 
-
+    SprawdzaniePar();
 
 }
 
@@ -87,7 +87,7 @@ void RysowanieKart(){
      println(fv[i]);
   }
 }
-int display_until_time = -1;
+
 // sprawdza położenie myszki i gdy ta została kliknięta w obszarze karty to rysuje jej środek
 void obrocKarte() {
 
@@ -95,19 +95,22 @@ void obrocKarte() {
       if((val == "1") || mousePressed && mouseX > x[i] && mouseX<(x[i] + myCard[0].cardWidth) &&
       mouseY > y[i] && mouseY < (y[i] + myCard[0].cardHeight) && (clicked[i] == false) ){
         //if (val == "Button 1") {i = 1;}
-
+       
         myCard[i].displayFront();
-
         clicked[i] = true;
-        
         cardUp[flipped] =  i; //cardUp[0] i cardUp[1]
 
         flipped ++;
       }
     }
-    
+}
+int j =0;
+void SprawdzaniePar() {
+//co 4 klatkę sprawdza czy jest para (dzieki temu pokazują się zawsze dwie karty
+  if (j%4 == 0){
 //sprawdzanie par
-     if (flipped == 2) {       
+     if (flipped == 2) {  
+
         println("0: ", fv[cardUp[0]]);
         println("1: ", fv[cardUp[1]]);
         
@@ -130,9 +133,11 @@ void obrocKarte() {
      
      //jak 3 pary to wyświetl wygraną i wyświetl zwycieskie światełka
      if (win == 3){
-       myPort.write('1');
+       //myPort.write('1');
        tekstWygranej();
       }
+  }
+j++;
 }
 
 //zmienianie indeksów kart
