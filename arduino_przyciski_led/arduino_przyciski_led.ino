@@ -7,6 +7,7 @@
 #define RED_LED_PIN 10
 #define GREEN_LED_PIN 9
 #define YELLOW_LED_PIN 8
+#define BUZZER_PIN 13
 
 void setup()
 {
@@ -29,6 +30,7 @@ void loop()
   ledBlink();
 } 
 
+
 void ledBlink(){
   if(ledState() == 'r'){
     digitalWrite(RED_LED_PIN, HIGH);
@@ -42,10 +44,19 @@ void ledBlink(){
     digitalWrite(GREEN_LED_PIN, LOW);
   }
 
-  if(ledState() == 'y'){ 
-    digitalWrite(YELLOW_LED_PIN, HIGH); 
-    delay(100);
-    digitalWrite(YELLOW_LED_PIN, LOW);
+  if(ledState() == 'w'){ 
+      digitalWrite(YELLOW_LED_PIN, HIGH); 
+      delay(50);
+      digitalWrite(YELLOW_LED_PIN, LOW);
+      delay(50);
+      digitalWrite(GREEN_LED_PIN, HIGH); 
+      delay(50);
+      digitalWrite(GREEN_LED_PIN, LOW);
+      delay(50);
+      digitalWrite(RED_LED_PIN, HIGH); 
+      delay(50);
+      digitalWrite(RED_LED_PIN, LOW);
+      delay(50);
   }
 }
 
@@ -64,12 +75,14 @@ void buttonState(){
   byte buttonState6 = digitalRead(BUTTON_PIN6);
   
   if(buttonState1) Serial.println(1);
-  if(buttonState2) Serial.println(2);    
+  if(buttonState2) Serial.println(2);  
   if(buttonState3) Serial.println(3);
   if(buttonState4) Serial.println(4);
   if(buttonState5) Serial.println(5);
   if(buttonState6) Serial.println(6);
- 
+
   delay(100);
+
+  return 0;
 }
   
