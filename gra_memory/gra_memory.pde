@@ -1,203 +1,198 @@
-//https://www.youtube.com/watch?v=EkTOTw_lpVg - zródło inspiracji
+//-------------- importowanie bibliotek ----------------
 import processing.serial.*;
-Serial myPort;
-String val;
+
+//-------------- zmienne globalne ----------------
+//x,y - współrzędne kart w tablicy
+//awers - lista jaki obrazek jest w każdym miescu planszy
+//  np. [1 2 3
+//       1 2 3]
+//cardUp - lista dwuelementowa lokalizacji kart, które sa obrócone względem lokalizacji na planszy 
+//      [0 1 2
+//       3 4 5]
+//clicked - lista zawierająca informacje o obróceniu kart' potrzeba do tego, żeby nie poswolić na zebranie pary przez klinięcie dwa zary tego samego obrazka
+//      [false true false
+//      false false true]
 
 int liczbaKart = 6;
-Cards[] myCard = new Cards[liczbaKart+1];
-int[] x = new int[liczbaKart+1];
-int[] y = new int[liczbaKart+1];
-int[] fv = new int[liczbaKart+1]; // lista jaki obrazek [1,2,3] jest w każdym miescu listy 
-int[] cardUp = new int[2]; //karty, które sa obrócone - odniesione do lokalizacji na planszy
-boolean[] clicked = new boolean[liczbaKart]; //zmienna, która określa, które karty są obrócone, by nie można było drugi raz ich kliknąć (zapobiega parze w parze
 
-PFont myFont;
+int[] x = new int[liczbaKart];
+int[] y = new int[liczbaKart];
+int[] awers = new int[liczbaKart];
+int[] cardUp = new int[2]; 
+boolean[] clicked = new boolean[liczbaKart]; 
 int flipped = 0; // określa, ile kart jest już obróconych 
 int win = 0; //określa ile par już zebrano
-int count = 1; // potrzebne do liczenia fv
+int tableWidth = 300;
+int tableHeight = 300;
 
-// niestety musiałam zrobić drugie względem klasy, bo za późno tworze obiekty ://
-int cardWidth = 300;
-int cardHeight = 300;
-  
+Cards[] myCard = new Cards[liczbaKart];
+Serial myPort;
+
+int inBuffer; //zawiera informacje z Arduino
+// uzaleznic odsłanianie kart od inBuffer, ktory przyjmuje wartosci guzikow tak :
+// 1  2  3
+// 4  5  6
+
+//-------------- setup() ----------------  
 void setup() {
-  //myPort = new Serial(this, "COM5",9600);
+  myPort = new Serial(this, "COM6",9600);
   
   frameRate(30);
   size(1500,900);
-  background(150);
-
 
   RysowanieKart();
-  myFont = createFont("Verdana",40,true);
-
 }
-String inBuffer;
-void draw() {
 
-  // uzaleznic odsłanianie kart od inBuffer, ktory przyjmuje wartosci guzikow tak :
-  // 1  2  3
-  // 4  5  6
+//-------------- draw() ----------------
+void draw() {
+  //czytaie informacji z Arduino
   while (myPort.available() > 0) {
-    inBuffer = myPort.readString();
-    println(inBuffer);
-    
-    if (inBuffer == "1") {
-    fill(255);
-      rect(0,0,50,50);
-  }
-  }
+    inBuffer = myPort.read();
+  }  
   
-  //zeby diody swiecily: 
-  // if(<brak pary>) {myPort.write('r'); delay(100);
-  // if(<para>) myPort.write('g'); delay(100);
-  // if(<wygrana>) myPort.write('w'); delay(3000);
-  
-  
-  //ładowanie kart
+  //ładowanie kart na planszy
   for (int i =0; i < liczbaKart; i ++) {
     myCard[i].display();
   }
-    obrocKarte(); //funkcja, która obraca karty i patrzy czy są falami
-
+    ObrocKarte(); 
     SprawdzaniePar();
-
 }
-
-
+ 
+//-------------- RysowanieKart() ---------------- 
+//funkcja tworząca tabelę kart i rysująca ją
 void RysowanieKart(){
   int odstep = 25;
-  int myX = (width - 3*cardWidth- odstep)/2;
+  int myX = (width - 3*tableWidth- odstep)/2;
   int myY = height/45;
-  int myFv = 0; //rysowanie zewnętrzej strony karty
 
-  // tworzenie mapy do wrysowania kart i ustawianie clicked na false   
+  Tasowanie(); //tworzy awers[] z lista odpowienich par w tabeli
+  // tworzenie tabeli kart i ustawianie clicked na false   
   for (int i = 0; i < liczbaKart; i++){
     clicked[i] = false; // jeżeli karta kliknięta to nie można jej kliknąć drugi raz, żeby nie była traktowana jako para
     x[i] = myX;
     y[i] = myY;
-    fv[i] = count; //nadawanie indeksów 1-3 dla kart, żeby można było szukać par
-    print(count);
-    count += 1;
-    
-    if (count == 4){
-      count = 1;
-    }
-    
-    if (myX < 2.5 * cardWidth){
-      myX += cardWidth+odstep;
-    }
-    else if (myX > 2.5 * cardWidth){
-      myX = (width - 3*cardWidth- odstep)/2;
-      myY += cardHeight + odstep;
-    }
-  }
-   tasowanie();
    
-   // rysowanie kart 
-   for (int i = 0; i < liczbaKart; i++){
-     myCard[i] = new Cards(x[i], y[i],fv[i]); 
-     println(fv[i]);
+    if (myX < 2.5 * tableWidth){ //rysowanie pierwszego rzedzu tabeli
+      myX += tableWidth+odstep;
+    }
+    else if (myX > 2.5 * tableWidth){ //rysowanie drugiego rzedu tabeli
+      myX = (width - 3*tableWidth- odstep)/2;
+      myY += tableHeight + odstep;
+    }
+   //rysowanie karty w odpowiednim miejscach 
+   myCard[i] = new Cards(x[i], y[i],awers[i]); 
+   println(awers[i]);
   }
 }
 
-// sprawdza położenie myszki i gdy ta została kliknięta w obszarze karty to rysuje jej środek
-void obrocKarte() {
-
-    for (int i = 0; i < liczbaKart+1; i ++){
-      if((inBuffer == "1") || mousePressed && mouseX > x[i] && mouseX<(x[i] + myCard[0].cardWidth) &&
+//-------------- ObrocKarte() ---------------- 
+//1) sprawdza położenie myszki i gdy ta została kliknięta w obszarze karty to rysuje jej awers
+//2) sprawdza kliknięcie guzika z Arduino i gdy ten został kliknięty to rysuje awers karty
+void ObrocKarte() {
+  //1) obracanie Kart myszką
+    for (int i = 0; i < liczbaKart; i ++){
+      if( mousePressed && mouseX > x[i] && mouseX<(x[i] + myCard[0].cardWidth) &&
       mouseY > y[i] && mouseY < (y[i] + myCard[0].cardHeight) && (clicked[i] == false) ){
-        //if (inBuffer == "Button 1") {i = 1;}
-       
-        myCard[i].displayFront();
-        clicked[i] = true;
-        cardUp[flipped] =  i; //cardUp[0] i cardUp[1]
-
+        myCard[i].displayAwers();
+        clicked[i] = true;     
+        cardUp[flipped] =  i; //cardUp[0] i cardUp[1] - uzupełnianie listy cardUp lokalizacją dwóch odwróconych kart    
         flipped ++;
       }
     }
-}
-int j =0;
-void SprawdzaniePar() {
-//co 4 klatkę sprawdza czy jest para (dzieki temu pokazują się zawsze dwie karty
-  if (j%4 == 0){
-//sprawdzanie par
-     if (flipped == 2) {  
 
-        println("0: ", fv[cardUp[0]]);
-        println("1: ", fv[cardUp[1]]);
-        
-      //sprawdzanie, czy to te same karty
-        if (fv[cardUp[0]] == fv[cardUp[1]]){ 
-          myCard[cardUp[0]].matched();
-          myCard[cardUp[1]].matched();
-          
-          myPort.write(2); 
-          delay(100);
-          
-          win +=1;
-        }
-     
-      ////UWAGA! tu jest problem, bo nie pokazują się dobrze karty, jak nie ma pary ;//
-        else if(fv[cardUp[0]] != fv[cardUp[1]]){
-             print("nie ma pary");
+  //2) obracanie kart przyciskami Arduino
+  //inBuffer:   1 2 3      karty:  0 1 2
+  //            4 5 6              3 4 5
+  int j=0;
+  if (inBuffer <10){ //zabezpieczenie przed presyłaniem z Arduino innych liczb niż 0-6
+    if((inBuffer) != 0 && (clicked[inBuffer-1] == false) ){
+      j = int(inBuffer) - 1;
+      //println("flipped:",flipped);
+      myCard[j].displayAwers();
+      clicked[j] = true;
+      //println("j",j);
+      cardUp[flipped] = j ; //cardUp[0] i cardUp[1]
+      //print("cardUp",cardUp[0], cardUp[1]);
 
-            resetPlanszy(cardUp[0]);
-            resetPlanszy(cardUp[1]);
-            
-            myPort.write(1); 
-            delay(100);
-        }
-                flipped = 0;
-      }
-     
-     //jak 3 pary to wyświetl wygraną i wyświetl zwycieskie światełka
-     if (win == 3){
-       //myPort.write('1');
-       tekstWygranej();
-       
-       myPort.write(3); 
-       delay(3000);
-      }
+      flipped ++;
+      inBuffer = 0;
+    }
   }
-j++;
 }
 
-//zmienianie indeksów kart
-void tasowanie() {
-//tworzenie listy par do tasowania
+//-------------- SprawdzaniePar() ---------------- 
+//funkcja sprawdza, czy dwie odsłonięte karty są parą
+void SprawdzaniePar() {
+  if (frameCount%4 == 0){ //co 4 klatkę sprawdza czy jest para (dzieki temu pokazują się zawsze dwie karty)
+     if (flipped == 2) {  
+        println("0: ", awers[cardUp[0]]);
+        println("1: ", awers[cardUp[1]]);
+        
+        if (awers[cardUp[0]] == awers[cardUp[1]]){ //para
+          myCard[cardUp[0]].Para();
+          myCard[cardUp[1]].Para();
+          win +=1;
+          
+          //wysyłanie informacji do Arduino o parze
+          myPort.write(2);
+          delay(1000);
+          myPort. write(0);
+        }
+ 
+        else if(awers[cardUp[0]] != awers[cardUp[1]]){ //nie ma pary
+            ResetKarty(cardUp[0]);
+            ResetKarty(cardUp[1]);
+            
+            //wysyłanie informacji do Arduino o braku pary
+            myPort.write(1);
+            delay(1000);
+            myPort.write(0);
+        }
+     flipped = 0;
+     }
+
+     if (win == 3){ //wygrana
+       Wygrana();
+       
+       //wysyłanie informacji do Arduino o wygranej
+       myPort.write(3);
+       delay(1000);
+       myPort.write(0);
+     }
+  }
+}
+
+//-------------- Tasowanie() ---------------- 
+//ustalenie nowych indeksów kart w awersie
+void Tasowanie() {
+//tworzenie listy par do tasowania [1 2 3 1 2 3]
   IntList numberList;
-  int a = liczbaKart;
   numberList = new IntList();
-   for (int j=0; j<2; j++){
-    for (int i=0; i<a/2; i++){
-      numberList.append(i+1);
+   for (int i=0; i<2; i++){
+    for (int j=0; j<(liczbaKart)/2; j++){
+      numberList.append(j+1);
     }
   }
   //tasowanie listy
   numberList.shuffle();
   
-  //przypisywanie nowej kolejności indeksów w fv, które odnoszą się do ułozenia par na planszy
-  int temp = 0;
-  int rand = 0;
+  //przypisywanie nowej kolejności indeksów w awers, które odnoszą się do ułozenia par na planszy
   for (int w = 0; w <liczbaKart; w ++){
-    rand = numberList.get(w);
-    temp = fv[w];
-    fv[w] = fv[rand];
-    fv[rand] = temp;
-
+    awers[w] = numberList.get(w);
   }
 }
 
-void resetPlanszy( int i){
-    myCard[i].faceDown();
+//-------------- ResetKarty() ---------------- 
+//int i - lokalizacja karty do obrócenia rewersem
+void ResetKarty(int i){
+    myCard[i].ObrocKarte();
     clicked[i] = false;
     flipped = 0; 
 }
-void tekstWygranej() {
-  textFont(myFont);
+
+//-------------- Wygrana() ---------------- 
+void Wygrana() {
   fill(255);
   textSize(40);
   text("Wygrałeś!", 3*width/7,4*height/5);
-
 }
