@@ -33,12 +33,18 @@ void setup() {
 
 void draw() {
 
-  //łaczenie z Arduino 
-  //if ( myPort.available() > 0) {  // If data is available,
-  //val = myPort.readStringUntil('\n');  // read it and store it in val 
-  //print(val);
-  //}
-  //if(val == "1"){}
+  // uzaleznic odsłanianie kart od inBuffer, ktory przyjmuje wartosci guzikow tak :
+  // 1  2  3
+  // 4  5  6
+  while (myPort.available() > 0) {
+    String inBuffer = myPort.readString();
+    println(inBuffer);
+  }
+  
+  //zeby diody swiecily: 
+  // if(<brak pary>) {myPort.write('r'); delay(100);
+  // if(<para>) myPort.write('g'); delay(100);
+  // if(<wygrana>) myPort.write('w'); delay(3000);
   
   
   //ładowanie kart
