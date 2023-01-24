@@ -25,20 +25,27 @@ void setup() {
   
   frameRate(30);
   size(1500,900);
+  background(150);
+
 
   RysowanieKart();
   myFont = createFont("Verdana",40,true);
 
 }
-
+String inBuffer;
 void draw() {
 
   // uzaleznic odsłanianie kart od inBuffer, ktory przyjmuje wartosci guzikow tak :
   // 1  2  3
   // 4  5  6
   while (myPort.available() > 0) {
-    String inBuffer = myPort.readString();
+    inBuffer = myPort.readString();
     println(inBuffer);
+    
+    if (inBuffer == "1") {
+    fill(255);
+      rect(0,0,50,50);
+  }
   }
   
   //zeby diody swiecily: 
@@ -98,9 +105,9 @@ void RysowanieKart(){
 void obrocKarte() {
 
     for (int i = 0; i < liczbaKart+1; i ++){
-      if((val == "1") || mousePressed && mouseX > x[i] && mouseX<(x[i] + myCard[0].cardWidth) &&
+      if((inBuffer == "1") || mousePressed && mouseX > x[i] && mouseX<(x[i] + myCard[0].cardWidth) &&
       mouseY > y[i] && mouseY < (y[i] + myCard[0].cardHeight) && (clicked[i] == false) ){
-        //if (val == "Button 1") {i = 1;}
+        //if (inBuffer == "Button 1") {i = 1;}
        
         myCard[i].displayFront();
         clicked[i] = true;
@@ -124,6 +131,10 @@ void SprawdzaniePar() {
         if (fv[cardUp[0]] == fv[cardUp[1]]){ 
           myCard[cardUp[0]].matched();
           myCard[cardUp[1]].matched();
+          
+          myPort.write(2); 
+          delay(100);
+          
           win +=1;
         }
      
@@ -133,6 +144,9 @@ void SprawdzaniePar() {
 
             resetPlanszy(cardUp[0]);
             resetPlanszy(cardUp[1]);
+            
+            myPort.write(1); 
+            delay(100);
         }
                 flipped = 0;
       }
@@ -141,6 +155,9 @@ void SprawdzaniePar() {
      if (win == 3){
        //myPort.write('1');
        tekstWygranej();
+       
+       myPort.write(3); 
+       delay(3000);
       }
   }
 j++;
