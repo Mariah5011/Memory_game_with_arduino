@@ -1,57 +1,75 @@
 #define BUTTON_PIN1 2
 #define BUTTON_PIN2 3
 #define BUTTON_PIN3 4
-
-char val; // Data received from the serial port
-int ledPin = 13;
-
-boolean ledState = LOW;
+#define BUTTON_PIN4 5
+#define BUTTON_PIN5 6
+#define BUTTON_PIN6 7
+#define RED_LED_PIN 10
+#define GREEN_LED_PIN 9
+#define YELLOW_LED_PIN 8
 
 void setup()
 {
   Serial.begin(9600);
-  pinMode(BUTTON_PIN1, INPUT_PULLUP);
-  pinMode(BUTTON_PIN2, OUTPUT);
-  pinMode(BUTTON_PIN3, OUTPUT);
-  pinMode(ledPin, OUTPUT);
+  pinMode(BUTTON_PIN1, INPUT);
+  pinMode(BUTTON_PIN2, INPUT);
+  pinMode(BUTTON_PIN3, INPUT);
+  pinMode(BUTTON_PIN4, INPUT);
+  pinMode(BUTTON_PIN5, INPUT);
+  pinMode(BUTTON_PIN6, INPUT);
+  pinMode(RED_LED_PIN, OUTPUT);
+  pinMode(GREEN_LED_PIN, OUTPUT);
+  pinMode(YELLOW_LED_PIN, OUTPUT);
 }
+
+
 void loop()
 {
+  buttonState();
+  ledBlink();
+} 
+
+void ledBlink(){
+  if(ledState() == 'r'){
+    digitalWrite(RED_LED_PIN, HIGH);
+    delay(100);
+    digitalWrite(RED_LED_PIN, LOW); 
+  }
+
+  if(ledState() == 'g'){
+    digitalWrite(GREEN_LED_PIN, HIGH); 
+    delay(100);
+    digitalWrite(GREEN_LED_PIN, LOW);
+  }
+
+  if(ledState() == 'y'){ 
+    digitalWrite(YELLOW_LED_PIN, HIGH); 
+    delay(100);
+    digitalWrite(YELLOW_LED_PIN, LOW);
+  }
+}
+
+char ledState(){
+  char input;
+  if (Serial.available()) input = Serial.read();
+  return input;
+}
+
+void buttonState(){
   byte buttonState1 = digitalRead(BUTTON_PIN1);
   byte buttonState2 = digitalRead(BUTTON_PIN2);
   byte buttonState3 = digitalRead(BUTTON_PIN3);
+  byte buttonState4 = digitalRead(BUTTON_PIN4);
+  byte buttonState5 = digitalRead(BUTTON_PIN5);
+  byte buttonState6 = digitalRead(BUTTON_PIN6);
   
-  if (buttonState1 == HIGH) {
-      Serial.println("1");
-  }
-    
-  if (buttonState2 == HIGH) {
-      Serial.println("Button 2");
-  }
-    
-  if (buttonState3 == HIGH) {
-      Serial.println("Button 3");
-  }
+  if(buttonState1) Serial.println(1);
+  if(buttonState2) Serial.println(2);    
+  if(buttonState3) Serial.println(3);
+  if(buttonState4) Serial.println(4);
+  if(buttonState5) Serial.println(5);
+  if(buttonState6) Serial.println(6);
  
   delay(100);
-
-  
-  //----------światełka--------
-  if (Serial.available()) 
-   { // If data is available to read,
-     val = Serial.read(); // read it and store it in val
-   }
-//   if (val == '1') 
-//   { // If 1 was received
-//     digitalWrite(ledPin, HIGH); // turn the LED on
-// }  
-//    delay(10); // Wait 10 milliseconds for next reading
-//    digitalWrite(ledPin, LOW); // otherwise turn it off
-if(val == '1') //if we get a 1
-    {
-       ledState = !ledState; //flip the ledState
-       digitalWrite(ledPin, ledState); 
-    }
-    delay(10);
-  } 
+}
   
