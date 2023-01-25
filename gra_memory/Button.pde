@@ -1,3 +1,11 @@
+/* 
+Button parameters:
+  vector position
+  width of button
+  height of button
+  color of button
+  text displayed 
+*/
 class Button {
   PVector Pos = new PVector(0,0);
   float Width = 0;
@@ -20,7 +28,9 @@ class Button {
     Text = t;
   }
   
-  void update()//must be placed in void draw() to work
+  // updates infromation about the button being clicked
+  
+  void update()   //must be placed in void draw() to work
   {
      if(mousePressed == true && mouseButton == LEFT && Pressed == false)
      {
@@ -36,7 +46,10 @@ class Button {
    }
   }
   
-  void render() //must be placed in void draw() function to render the button to the screen
+  
+// renders the button to the screen
+  
+  void render()       //must be placed in void draw() function 
   {
     fill(Colour);
     stroke(224, 86, 59);
@@ -49,7 +62,11 @@ class Button {
     textFont(myFont);
     text(Text, Pos.x + (Width/2), Pos.y +(Height/2)- 5);
   }
-  boolean isClicked() //Use this in a if statement to check if the button has been clicked
+  
+// enables to check if the button has been clicked
+// use this in a if statement to check if the button has been clicked
+  
+  boolean isClicked() 
   {
     return Clicked;
   }
