@@ -26,6 +26,7 @@ int tableWidth = 300;
 int tableHeight = 300;
 
 PImage bg;
+PImage chopsticks;
 
 int inBuffer; //zawiera informacje z Arduino
 // uzaleznic odsłanianie kart od inBuffer, ktory przyjmuje wartosci guzikow tak :
@@ -44,6 +45,10 @@ void setup() {
   //tło menu z sushi
   tlo = loadImage("sushibg.jpg");  
   tlo.resize(1500,900);
+  
+  chopsticks = loadImage("chopsticks.png");
+  chopsticks.resize(100, 100);
+  
  //tworzenie przycisków
  start = new Button(60, 740, 150, 80, "START GAME", 247, 131, 107);
  exit = new Button(240, 740, 150, 80, "EXIT", 247, 131, 107);
@@ -262,6 +267,7 @@ void startScreen(){
 
 void gameScreen(){
   image(bg, 0, 0);
+  cursor(chopsticks);
   for (int i =0; i < liczbaKart; i ++) {
     myCard[i].display();
   }
