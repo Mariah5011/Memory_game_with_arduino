@@ -1,5 +1,6 @@
 //-------------- importowanie bibliotek ----------------
 import processing.serial.*;
+import processing.sound.*;
 
 //-------------- zmienne globalne ----------------
 //x,y - współrzędne kart w tablicy
@@ -27,6 +28,8 @@ int tableHeight = 300;
 
 PImage bg;
 PImage chopsticks;
+SoundFile music;
+
 
 int inBuffer; //zawiera informacje z Arduino
 // uzaleznic odsłanianie kart od inBuffer, ktory przyjmuje wartosci guzikow tak :
@@ -38,6 +41,8 @@ void setup() {
   //okno
   frameRate(30);
   size(1500,900);
+  music = new SoundFile(this, "music.wav");
+  music.play();
   
   // tło w grze z corgisiem
   bg = loadImage("corgi_tlo.jpg");  
