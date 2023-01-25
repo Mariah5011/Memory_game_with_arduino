@@ -7,6 +7,7 @@ void setup() {
   //size(1500,900);
   music = new SoundFile(this, "music.wav");
   music.play();
+  music.loop();
   
   // tło w grze z corgisiem
   bg = loadImage("corgi_tlo.jpg");  
