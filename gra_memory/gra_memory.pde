@@ -20,6 +20,11 @@ void setup() {
   chopsticks = loadImage("chopsticks.png");
   chopsticks.resize(32, 32);
   
+  onigiri = loadImage("onigiri.png");
+  onigiri.resize(300, 300);
+  
+  text = "The game you are about to play is called Memory. You have to find three pairs of identical cards. Use buttons on Arduino set or click with a mouse on each card to flip it over. Have fun!";
+  
   //tworzenie przycisków
   start = new Button(60, height-150, 150, 80, "START GAME", 247, 131, 107);
   exit = new Button(240, height-150, 150, 80, "EXIT", 247, 131, 107);
@@ -225,6 +230,13 @@ void buttons(){
 //-------------- startScreen() ---------------- 
 void startScreen(){
   image(tlo, 0, 0);
+  fill(255, 180);
+  rect(350, 200, 800, 400);
+  fill(#037162);
+  textFont(myFont);
+  textSize(35);
+  text(text, 370, 200, 780, 380);
+  image(onigiri, 970, 400);
   scrmode = 1;
 }
 
