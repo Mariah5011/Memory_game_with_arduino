@@ -7,6 +7,7 @@ void setup() {
   //size(1500,900);
   music = new SoundFile(this, "music.wav");
   music.play();
+  music.loop();
   
   // tło w grze z corgisiem
   bg = loadImage("corgi_tlo.jpg");  
@@ -14,10 +15,10 @@ void setup() {
   
   //tło menu z sushi
   tlo = loadImage("sushibg.jpg");  
-  tlo.resize(1500,900);
+  tlo.resize(width,height);
   
   chopsticks = loadImage("chopsticks.png");
-  chopsticks.resize(100, 100);
+  chopsticks.resize(32, 32);
   
   //tworzenie przycisków
   start = new Button(60, height-150, 150, 80, "START GAME", 247, 131, 107);
@@ -37,12 +38,12 @@ void setup() {
 //-------------- draw() ----------------
 void draw() {
   print(scrmode);
-  //background(tlo); 
   
   //czytaie informacji z Arduino
   while (myPort.available() > 0) {
     inBuffer = myPort.read();
   }  
+  
   screenMode();
   if(scrmode == 1) { 
     startScreen();
@@ -50,7 +51,7 @@ void draw() {
   if (scrmode == 2 ) {
     gameScreen();
   } 
-   buttons();
+  buttons();
 }
  
 //-------------- RysowanieKart() ---------------- 
@@ -79,7 +80,6 @@ void RysowanieKart(){
    myCard[i] = new Cards(x[i], y[i],awers[i]); 
    println(awers[i]);
   }
-  myPort.write(0); //------------------------------- sprawdzić z guzikami
 }
 
 //-------------- ObrocKarte() ---------------- 
