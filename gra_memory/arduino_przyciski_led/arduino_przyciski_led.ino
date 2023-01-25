@@ -33,7 +33,6 @@ void loop()
 //1 - czerwony LED
 //2 - zielony LED
 //3 - wszystkie kolory naprzemiennie
-
 void ledBlink(){
 
   switch(ledState()){
@@ -59,10 +58,11 @@ void ledBlink(){
           digitalWrite(RED_LED_PIN, HIGH); 
           delay(50);
           digitalWrite(RED_LED_PIN, LOW);
-          delay(50);  
+          delay(50); 
+          return; 
 
   }
-
+}
  // }
   // if(ledState() == 'r'){
   //   digitalWrite(RED_LED_PIN, HIGH);
@@ -80,9 +80,7 @@ void ledBlink(){
   //   digitalWrite(YELLOW_LED_PIN, HIGH); 
   //   delay(100);
   //   digitalWrite(YELLOW_LED_PIN, LOW);
-  // }
-}
- 
+  // } 
 
 int ledState(){
   int input;
@@ -91,6 +89,9 @@ int ledState(){
     return input;
 }
 
+//informacja o klikniętym przycisku jest wysyłana do Processingu; wysyłane komentarze odpowiednio do ułożenia przycisku:
+// 1 2 3
+// 4 5 6 
 void buttonState(){
   byte buttonState1 = digitalRead(BUTTON_PIN1);
   byte buttonState2 = digitalRead(BUTTON_PIN2);
@@ -112,8 +113,8 @@ void buttonState(){
 //  if(buttonState4) Serial.println("4");
 //  if(buttonState5) Serial.println("5");
 //  if(buttonState6) Serial.println("6");
-  delay(100);
 
+  delay(100);
   return;
 }
   

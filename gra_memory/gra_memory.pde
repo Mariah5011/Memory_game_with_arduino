@@ -38,8 +38,7 @@ void setup() {
   size(1500,900);
   
   // tło menu z corgisiem
-  //tlo = loadImage("corgi_tlo.jpg");
-  tlo = loadImage("img2.PNG");
+  tlo = loadImage("corgi_tlo.jpg");
   tlo.resize(1500,900);
   
   myFont = createFont("vanilla_caramel.otf", 30);
@@ -50,6 +49,7 @@ void setup() {
   conf[i] = new Confetti();
   }
   
+  //============jezeli nie bedzie działał przycisk to dodac też to do niego
   RysowanieKart();
 }
 
@@ -62,12 +62,14 @@ void draw() {
     inBuffer = myPort.read();
   }  
   
+  // ====================== przycisk start
   //ładowanie kart na planszy
   for (int i =0; i < liczbaKart; i ++) {
     myCard[i].display();
   }
     ObrocKarte(); 
     SprawdzaniePar();
+    //==============================
 }
  
 //-------------- RysowanieKart() ---------------- 
@@ -96,6 +98,7 @@ void RysowanieKart(){
    myCard[i] = new Cards(x[i], y[i],awers[i]); 
    println(awers[i]);
   }
+  myPort.write(0); //------------------------------- sprawdzić z guzikami
 }
 
 //-------------- ObrocKarte() ---------------- 
@@ -150,7 +153,7 @@ void SprawdzaniePar() {
           //wysyłanie informacji do Arduino o parze
           myPort.write(2);
           delay(1000);
-          myPort. write(0);
+          myPort.write(0);
         }
  
         else if(awers[cardUp[0]] != awers[cardUp[1]]){ //nie ma pary

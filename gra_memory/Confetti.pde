@@ -9,8 +9,7 @@ PImage confsushi;
   }
   
   void show() {
-   //confsushi = loadImage("sushi.png");
-   confsushi = loadImage("img3.PNG");
+   confsushi = loadImage("sushi.png");
    confsushi.resize(s, s);
    image(confsushi, x, y);
   }
