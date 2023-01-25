@@ -25,6 +25,7 @@ int win = 0; //określa ile par już zebrano
 int tableWidth = 300;
 int tableHeight = 300;
 
+PImage bg;
 
 int inBuffer; //zawiera informacje z Arduino
 // uzaleznic odsłanianie kart od inBuffer, ktory przyjmuje wartosci guzikow tak :
@@ -37,9 +38,15 @@ void setup() {
   frameRate(30);
   size(1500,900);
   
-  // tło menu z corgisiem
-  tlo = loadImage("corgi_tlo.jpg");
+  // tło w grze z corgisiem
+  bg = loadImage("corgi_tlo.jpg");  
+  bg.resize(1500,900);
+  //tło menu z sushi
+  tlo = loadImage("sushibg.jpg");  
   tlo.resize(1500,900);
+ //tworzenie przycisków
+ start = new Button(60, 740, 150, 80, "START GAME", 247, 131, 107);
+ exit = new Button(240, 740, 150, 80, "EXIT", 247, 131, 107);
   
   myFont = createFont("vanilla_caramel.otf", 30);
   myPort = new Serial(this, "COM6",9600);
@@ -62,13 +69,22 @@ void draw() {
     inBuffer = myPort.read();
   }  
   
+  if(scrmode == 1) { 
+    startScreen();
+  }
+  if (scrmode == 2 ) {
+    gameScreen();
+  }
+  
+   buttons();
+  
   // ====================== przycisk start
   //ładowanie kart na planszy
-  for (int i =0; i < liczbaKart; i ++) {
+  /*for (int i =0; i < liczbaKart; i ++) {
     myCard[i].display();
   }
     ObrocKarte(); 
-    SprawdzaniePar();
+    SprawdzaniePar();*/
     //==============================
 }
  
@@ -219,4 +235,39 @@ void Wygrana() {
      conf[i].fall();
      conf[i].show();
   }
+}
+// wybieranie trybu ekranu
+void screenMode(){
+  if(start.isClicked()){
+    scrmode = 2;  
+  }
+  if(exit.isClicked()){
+    scrmode = 1;
+  }
+}
+
+void buttons(){
+    start.update();
+    start.render();
+    exit.update();
+    exit .render();
+}
+
+void startScreen(){
+  image(tlo, 0, 0);
+  
+  
+  scrmode = 1;
+}
+
+void gameScreen(){
+  image(bg, 0, 0);
+  for (int i =0; i < liczbaKart; i ++) {
+    myCard[i].display();
+  }
+    ObrocKarte(); 
+    SprawdzaniePar();
+    
+  
+  scrmode = 2;
 }
