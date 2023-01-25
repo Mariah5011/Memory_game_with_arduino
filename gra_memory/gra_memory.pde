@@ -28,6 +28,9 @@ int tableHeight = 300;
 Cards[] myCard = new Cards[liczbaKart];
 Serial myPort;
 
+//PImage tlo; 
+//Confetti[] conf = new Confetti[100]; - zdefiniowanie tablicy z nowymi obiektami confetti
+
 int inBuffer; //zawiera informacje z Arduino
 // uzaleznic odsłanianie kart od inBuffer, ktory przyjmuje wartosci guzikow tak :
 // 1  2  3
@@ -35,16 +38,27 @@ int inBuffer; //zawiera informacje z Arduino
 
 //-------------- setup() ----------------  
 void setup() {
+  /* tło z corgisiem
+  tlo = loadImage("corgi_tlo.jpg");
+  tlo.resize(1500,900);
+  */
+  
   myPort = new Serial(this, "COM6",9600);
   
   frameRate(30);
   size(1500,900);
 
   RysowanieKart();
+ // myFont = createFont("data/vanilla_caramel.otf", 30) - nowa czcionka
+ /* stworzenie nowego obiektu confetti 
+  for (int i = 0; i< conf.length; i++){
+  conf[i] = new Confetti();
+  */
 }
 
 //-------------- draw() ----------------
 void draw() {
+//background(tlo); - tło musi być w draw, żeby confetti działało:(
   //czytaie informacji z Arduino
   while (myPort.available() > 0) {
     inBuffer = myPort.read();
@@ -153,6 +167,11 @@ void SprawdzaniePar() {
 
      if (win == 3){ //wygrana
        Wygrana();
+       /* Jeśli wygrałeś, to włącza się confetti
+       for (int i =0; i < conf.length; i++){
+          conf[i].fall();
+          conf[i].show();
+       }*/
        
        //wysyłanie informacji do Arduino o wygranej
        myPort.write(3);
@@ -196,3 +215,11 @@ void Wygrana() {
   textSize(40);
   text("Wygrałeś!", 3*width/7,4*height/5);
 }
+/* Tekst wygranej dostosowany do nowej czcionki
+void tekstWygranej() {
+  textFont(myFont);
+  fill(#FA910F);
+  textSize(80);
+  text("YOU WIN!", 3*width/7,4*height/5);
+
+}*/
