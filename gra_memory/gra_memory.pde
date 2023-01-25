@@ -14,9 +14,10 @@ void setup() {
   
   //tło menu z sushi
   tlo = loadImage("sushibg.jpg");  
-  tlo.resize(width,height);
-  //chopsticks = loadImage("chopsticks.png");
-  //chopsticks.resize(100, 100);
+  tlo.resize(1500,900);
+  
+  chopsticks = loadImage("chopsticks.png");
+  chopsticks.resize(100, 100);
   
   //tworzenie przycisków
   start = new Button(60, height-150, 150, 80, "START GAME", 247, 131, 107);
