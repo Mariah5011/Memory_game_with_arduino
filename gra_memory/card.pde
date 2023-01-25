@@ -7,8 +7,8 @@ class Cards {
   int cardY = 0; //współrzędna y karty
   int Awers = 0; //przód karty
   //cardName - lista grafik do gry, pierwsza to awers karty
-  String[] cardName = {"img1_1.jpg", "img2.PNG", "img3.PNG", "img4.PNG",
-                          "img2.jpg", "img3.PNG", "img4.PNG"};
+  String[] cardName = {"img1_1.jpg", "img2.PNG", "img3.PNG", "img4.PNG"};
+                          //"img2.jpg", "img3.PNG", "img4.PNG"};
   
 Cards(int x, int y, int awers) {
     cardX = x;

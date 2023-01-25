@@ -19,6 +19,7 @@ class Button {
     Colour = color(r, g, b);
     Text = t;
   }
+  
   void update()//must be placed in void draw() to work
   {
      if(mousePressed == true && mouseButton == LEFT && Pressed == false)
@@ -47,10 +48,9 @@ class Button {
     textSize(20);
     textFont(myFont);
     text(Text, Pos.x + (Width/2), Pos.y +(Height/2)- 5);
-    
   }
   boolean isClicked() //Use this in a if statement to check if the button has been clicked
   {
     return Clicked;
   }
-}  
+} 

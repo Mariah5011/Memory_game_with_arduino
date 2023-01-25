@@ -25,11 +25,6 @@ int win = 0; //określa ile par już zebrano
 int tableWidth = 300;
 int tableHeight = 300;
 
-Cards[] myCard = new Cards[liczbaKart];
-Serial myPort;
-
-//PImage tlo; 
-//Confetti[] conf = new Confetti[100]; - zdefiniowanie tablicy z nowymi obiektami confetti
 
 int inBuffer; //zawiera informacje z Arduino
 // uzaleznic odsłanianie kart od inBuffer, ktory przyjmuje wartosci guzikow tak :
@@ -38,27 +33,30 @@ int inBuffer; //zawiera informacje z Arduino
 
 //-------------- setup() ----------------  
 void setup() {
-  /* tło z corgisiem
-  tlo = loadImage("corgi_tlo.jpg");
-  tlo.resize(1500,900);
-  */
-  
-  myPort = new Serial(this, "COM6",9600);
-  
+  //okno
   frameRate(30);
   size(1500,900);
-
-  RysowanieKart();
- // myFont = createFont("data/vanilla_caramel.otf", 30) - nowa czcionka
- /* stworzenie nowego obiektu confetti 
+  
+  // tło menu z corgisiem
+  //tlo = loadImage("corgi_tlo.jpg");
+  tlo = loadImage("img2.PNG");
+  tlo.resize(1500,900);
+  
+  myFont = createFont("vanilla_caramel.otf", 30);
+  myPort = new Serial(this, "COM6",9600);
+  
+  //stworzenie nowego obiektu confetti 
   for (int i = 0; i< conf.length; i++){
   conf[i] = new Confetti();
-  */
+  }
+  
+  RysowanieKart();
 }
 
 //-------------- draw() ----------------
 void draw() {
-//background(tlo); - tło musi być w draw, żeby confetti działało:(
+  background(tlo); 
+  
   //czytaie informacji z Arduino
   while (myPort.available() > 0) {
     inBuffer = myPort.read();
@@ -79,7 +77,8 @@ void RysowanieKart(){
   int myX = (width - 3*tableWidth- odstep)/2;
   int myY = height/45;
 
-  Tasowanie(); //tworzy awers[] z lista odpowienich par w tabeli
+  Tasowanie(); //tworzy awers[] z lista losowo ułożonych par w tabeli
+  
   // tworzenie tabeli kart i ustawianie clicked na false   
   for (int i = 0; i < liczbaKart; i++){
     clicked[i] = false; // jeżeli karta kliknięta to nie można jej kliknąć drugi raz, żeby nie była traktowana jako para
@@ -120,6 +119,7 @@ void ObrocKarte() {
   int j=0;
   if (inBuffer <10){ //zabezpieczenie przed presyłaniem z Arduino innych liczb niż 0-6
     if((inBuffer) != 0 && (clicked[inBuffer-1] == false) ){
+      delay(500);
       j = int(inBuffer) - 1;
       //println("flipped:",flipped);
       myCard[j].displayAwers();
@@ -164,21 +164,16 @@ void SprawdzaniePar() {
         }
      flipped = 0;
      }
-
+  }
      if (win == 3){ //wygrana
        Wygrana();
-       /* Jeśli wygrałeś, to włącza się confetti
-       for (int i =0; i < conf.length; i++){
-          conf[i].fall();
-          conf[i].show();
-       }*/
        
        //wysyłanie informacji do Arduino o wygranej
        myPort.write(3);
        delay(1000);
        myPort.write(0);
      }
-  }
+  
 }
 
 //-------------- Tasowanie() ---------------- 
@@ -211,15 +206,14 @@ void ResetKarty(int i){
 
 //-------------- Wygrana() ---------------- 
 void Wygrana() {
-  fill(255);
-  textSize(40);
-  text("Wygrałeś!", 3*width/7,4*height/5);
-}
-/* Tekst wygranej dostosowany do nowej czcionki
-void tekstWygranej() {
   textFont(myFont);
   fill(#FA910F);
   textSize(80);
   text("YOU WIN!", 3*width/7,4*height/5);
-
-}*/
+  
+  // Jeśli wygrałeś, to włącza się confetti
+  for (int i =0; i < conf.length; i++){
+     conf[i].fall();
+     conf[i].show();
+  }
+}
