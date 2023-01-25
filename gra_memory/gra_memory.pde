@@ -252,7 +252,7 @@ void screenMode(){
     scrmode = 2;  
   }
   if(exit.isClicked()){
-    scrmode = 1;
+    exit();
   }
 }
 
@@ -278,7 +278,4 @@ void gameScreen(){
   }
     ObrocKarte(); 
     SprawdzaniePar();
-    
-  
-  scrmode = 2;
 }
