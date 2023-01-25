@@ -17,7 +17,7 @@ class Button {
   Boolean Over = false;
   color Highlight;
   
-  //Constructor to create a button
+  //Konstruktor tworzenia przycisku
   Button(int x, int y, int w, int h, String t, int r, int g, int b)
   {
     Pos.x = x;
@@ -28,9 +28,8 @@ class Button {
     Text = t;
   }
   
-  // updates infromation about the button being clicked
-  
-  void update()   //must be placed in void draw() to work
+  //zczytuje info czy button kliknięty, czy nie
+  void update()   //draw() funkcion
   {
      if(mousePressed == true && mouseButton == LEFT && Pressed == false)
      {
@@ -47,9 +46,8 @@ class Button {
   }
   
   
-// renders the button to the screen
-  
-  void render()       //must be placed in void draw() function 
+// rendorowanie przycisku na ekranie
+  void render()       //draw() function 
   {
     fill(Colour);
     stroke(224, 86, 59);
@@ -63,9 +61,7 @@ class Button {
     text(Text, Pos.x + (Width/2), Pos.y +(Height/2)- 5);
   }
   
-// enables to check if the button has been clicked
-// use this in a if statement to check if the button has been clicked
-  
+// sprawdza, czy button kliknięty
   boolean isClicked() 
   {
     return Clicked;

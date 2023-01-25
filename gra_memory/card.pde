@@ -1,4 +1,4 @@
-sclass Cards {
+class Cards {
   PImage cardImage;
   int show = 0; //zmienna okreslająca tył (0) lub przód (1) karty
   int cardWidth = 300;

@@ -1,101 +1,55 @@
-//-------------- importowanie bibliotek ----------------
-import processing.serial.*;
-import processing.sound.*;
-
-//-------------- zmienne globalne ----------------
-//x,y - współrzędne kart w tablicy
-//awers - lista jaki obrazek jest w każdym miescu planszy
-//  np. [1 2 3
-//       1 2 3]
-//cardUp - lista dwuelementowa lokalizacji kart, które sa obrócone względem lokalizacji na planszy 
-//      [0 1 2
-//       3 4 5]
-//clicked - lista zawierająca informacje o obróceniu kart' potrzeba do tego, żeby nie poswolić na zebranie pary przez klinięcie dwa zary tego samego obrazka
-//      [false true false
-//      false false true]
-
-int liczbaKart = 6;
-
-int[] x = new int[liczbaKart];
-int[] y = new int[liczbaKart];
-int[] awers = new int[liczbaKart];
-int[] cardUp = new int[2]; 
-boolean[] clicked = new boolean[liczbaKart]; 
-int flipped = 0; // określa, ile kart jest już obróconych 
-int win = 0; //określa ile par już zebrano
-int tableWidth = 300;
-int tableHeight = 300;
-
-PImage bg;
-PImage chopsticks;
-SoundFile music;
-
-
-int inBuffer; //zawiera informacje z Arduino
-// uzaleznic odsłanianie kart od inBuffer, ktory przyjmuje wartosci guzikow tak :
-// 1  2  3
-// 4  5  6
 
 //-------------- setup() ----------------  
 void setup() {
   //okno
   frameRate(30);
-  size(1500,900);
+  fullScreen();
+  //size(1500,900);
   music = new SoundFile(this, "music.wav");
   music.play();
   
   // tło w grze z corgisiem
   bg = loadImage("corgi_tlo.jpg");  
-  bg.resize(1500,900);
+  bg.resize(width,height);
+  
   //tło menu z sushi
   tlo = loadImage("sushibg.jpg");  
-  tlo.resize(1500,900);
+  tlo.resize(width,height);
+  //chopsticks = loadImage("chopsticks.png");
+  //chopsticks.resize(100, 100);
   
-  chopsticks = loadImage("chopsticks.png");
-  chopsticks.resize(100, 100);
-  
- //tworzenie przycisków
- start = new Button(60, 740, 150, 80, "START GAME", 247, 131, 107);
- exit = new Button(240, 740, 150, 80, "EXIT", 247, 131, 107);
+  //tworzenie przycisków
+  start = new Button(60, height-150, 150, 80, "START GAME", 247, 131, 107);
+  exit = new Button(240, height-150, 150, 80, "EXIT", 247, 131, 107);
   
   myFont = createFont("vanilla_caramel.otf", 30);
+  
   myPort = new Serial(this, "COM6",9600);
   
   //stworzenie nowego obiektu confetti 
   for (int i = 0; i< conf.length; i++){
   conf[i] = new Confetti();
   }
-  
-  //============jezeli nie bedzie działał przycisk to dodac też to do niego
   RysowanieKart();
 }
 
 //-------------- draw() ----------------
 void draw() {
-  background(tlo); 
+  print(scrmode);
+  //background(tlo); 
   
   //czytaie informacji z Arduino
   while (myPort.available() > 0) {
     inBuffer = myPort.read();
   }  
-  
+  screenMode();
   if(scrmode == 1) { 
     startScreen();
   }
   if (scrmode == 2 ) {
     gameScreen();
-  }
-  
+  } 
    buttons();
-  
-  // ====================== przycisk start
-  //ładowanie kart na planszy
-  /*for (int i =0; i < liczbaKart; i ++) {
-    myCard[i].display();
-  }
-    ObrocKarte(); 
-    SprawdzaniePar();*/
-    //==============================
 }
  
 //-------------- RysowanieKart() ---------------- 
@@ -113,7 +67,7 @@ void RysowanieKart(){
     x[i] = myX;
     y[i] = myY;
    
-    if (myX < 2.5 * tableWidth){ //rysowanie pierwszego rzedzu tabeli
+    if (myX < 3 * tableWidth){ //rysowanie pierwszego rzedzu tabeli
       myX += tableWidth+odstep;
     }
     else if (myX > 2.5 * tableWidth){ //rysowanie drugiego rzedu tabeli
@@ -238,7 +192,7 @@ void Wygrana() {
   textFont(myFont);
   fill(#FA910F);
   textSize(80);
-  text("YOU WIN!", 3*width/7,4*height/5);
+  text("YOU WIN!", 3*width/6,4*height/5);
   
   // Jeśli wygrałeś, to włącza się confetti
   for (int i =0; i < conf.length; i++){
@@ -246,6 +200,8 @@ void Wygrana() {
      conf[i].show();
   }
 }
+
+//-------------- screenMode() ---------------- 
 // wybieranie trybu ekranu
 void screenMode(){
   if(start.isClicked()){
@@ -253,9 +209,11 @@ void screenMode(){
   }
   if(exit.isClicked()){
     scrmode = 1;
+    exit();
   }
 }
 
+//-------------- buttons() ---------------- 
 void buttons(){
     start.update();
     start.render();
@@ -263,22 +221,21 @@ void buttons(){
     exit .render();
 }
 
+//-------------- startScreen() ---------------- 
 void startScreen(){
   image(tlo, 0, 0);
-  
-  
   scrmode = 1;
 }
 
+//-------------- gameScreen() ---------------- 
 void gameScreen(){
   image(bg, 0, 0);
-  cursor(chopsticks);
+  //cursor(chopsticks);
   for (int i =0; i < liczbaKart; i ++) {
     myCard[i].display();
   }
-    ObrocKarte(); 
-    SprawdzaniePar();
-    
+  ObrocKarte(); 
+  SprawdzaniePar();
   
   scrmode = 2;
 }
