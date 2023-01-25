@@ -52,7 +52,7 @@ void setup() {
   tlo.resize(1500,900);
   
   chopsticks = loadImage("chopsticks.png");
-  chopsticks.resize(100, 100);
+  chopsticks.resize(32, 32);
   
  //tworzenie przycisków
  start = new Button(60, 740, 150, 80, "START GAME", 247, 131, 107);
