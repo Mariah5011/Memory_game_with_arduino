@@ -11,4 +11,4 @@ Button start;
 Button exit;
 Cards[] myCard = new Cards[liczbaKart];
 Confetti[] conf = new Confetti[50]; 
-scrmode = 1;
+int scrmode = 1;
