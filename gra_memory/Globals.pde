@@ -35,7 +35,9 @@ PImage chopsticks;
 PFont myFont;
 PImage sushi; 
 PImage tlo;
+PImage onigiri;
 SoundFile music;
+String text;
 
 Serial myPort;
 Button start;
